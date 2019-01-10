@@ -20,17 +20,19 @@ embedding_function = no_embedding
 action_selection_function = random_action
 
 # Make the environment using StableBaselines.
-if "FrameSkip" in ENV_NAME:
+if "Frameskip" in ENV_NAME:
     env = make_atari_snapshot_env(ENV_NAME, num_env=1, seed=seed)
     unwrapped_env = env.envs[0].unwrapped
-
     observation_space = env.reset().shape
     action_space = unwrapped_env.action_space
+    env.environment_category = "Atari"
 else:
     env = gym.make(ENV_NAME)
     env = SnapshotVecEnv([lambda: env])
     observation_space = env.reset().shape
     action_space = env.action_space
+    env.environment_category = "Classic"
+
 
 
 print("\n########################################################################")
@@ -48,11 +50,11 @@ print("Initial state: ", env.envs[0].unwrapped.state)
 def main():
     for _ in range(50):
         obs, rewards, dones, info = env.step([0])
-        # env.render()
-    env.close()
+        env.render()
     saved_state = env.get_env_pickle()
+    print("Saved state: ", env.envs[0].unwrapped.state)
     for _ in range(50):
-        obs, rewards, dones, info = env.step([2])
+        obs, rewards, dones, info = env.step([1])
         env.render()
     print("Right before loading state: ", env.envs[0].unwrapped.state)
     env.load_env_pickle(saved_state)
