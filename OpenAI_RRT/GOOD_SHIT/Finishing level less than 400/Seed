@@ -1,0 +1,12 @@
+########################################################################
+#
+# RRT Starting on SuperMarioWorld-Snes
+# The seed is 509
+# The action space is: MultiBinary(12)
+# The observation space is:(1, 224, 256, 3)
+#
+# The embedding function is pix2mem
+# The action policy is chaos_monkey
+# The distance metric is euclidian_distance
+# 
+########################################################################

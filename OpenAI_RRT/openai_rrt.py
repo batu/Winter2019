@@ -4,28 +4,29 @@ import random
 import retro
 
 from stable_baselines.common.misc_util import set_global_seeds
-from stable_baselines.common.cmd_util import make_atari_snapshot_env
+from stable_baselines.common.cmd_util import make_retro_env, make_atari_snapshot_env
 from stable_baselines.common.vec_env import SnapshotVecEnv
 
 
-from rrt_functions import no_embedding, pix2mem
-from rrt_functions import random_action, learned_policy
+from rrt_functions import no_embedding, pix2mem, GO_explore_downsampling
+from rrt_functions import random_action, learned_policy, chaos_monkey
 from rrt_functions import get_random_goal, get_random_goal_pix2mem
 from rrt_functions import euclidian_distance
-from rrt_functions import run_rrt, get_score
+from rrt_functions import run_rrt, run_rrt_rebase, get_score
 
 # Set up variables
 #ENV_NAME = 'PongNoFrameskip-v4'
+# ENV_NAME = "Breakout-Atari2600"
 ENV_NAME = "SuperMarioWorld-Snes"
 #ENV_NAME = 'MountainCar-v0'
 seed = random.randint(0,1000)
 set_global_seeds(seed)
 # Hyperparameters
-training_steps = 10;
-embedding_function = pix2mem
-action_selection_function = learned_policy
+training_steps = 100
+embedding_function = GO_explore_downsampling
+action_selection_function = chaos_monkey
 distance_measure = euclidian_distance
-get_goal = get_random_goal_pix2mem
+goal_selection_policy = get_random_goal_pix2mem
 
 # Make the environment using StableBaselines.
 if "Frameskip" in ENV_NAME:
@@ -34,9 +35,9 @@ if "Frameskip" in ENV_NAME:
     observation_space = env.reset().shape
     action_space = unwrapped_env.action_space
     env.environment_category = "Atari"
-elif "Snes" in ENV_NAME:
+elif True:
     env = retro.make(ENV_NAME)
-    env = SnapshotVecEnv([lambda: env])
+    env = SnapshotVecEnv([lambda: env], training=False)
     unwrapped_env = env.envs[0].unwrapped
     observation_space = env.reset().shape
     action_space = unwrapped_env.action_space
@@ -65,7 +66,7 @@ print("########################################################################\
 
 
 def main():
-    policy_embeddings, pickles = run_rrt(env, embedding_function, action_selection_function, distance_measure, get_goal, verbose=True, rendering=True)
+    policy_embeddings, pickles = run_rrt_rebase(env, embedding_function, action_selection_function, distance_measure, goal_selection_policy, rendering=True)
 
 
 def save_pickles(pickles, pickle_count, save_name):

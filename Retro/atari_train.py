@@ -9,7 +9,7 @@ from stable_baselines import PPO2
 # multiprocess environment
 n_cpu = 6
 env = SubprocVecEnv([lambda: gym.make('Breakout-ram-v0') for i in range(n_cpu)])
-
+print(env.reset())
 log_dir = "tmp/models/"
 os.makedirs(log_dir, exist_ok=True)
 

@@ -1,0 +1,5 @@
+1) The Autoencoder that works.
+
+2) The Autopredictor that is fit on only 10 points, and that is gone through temporal 10 step.
+
+3) The Autopredictor with 10 autcomes.
